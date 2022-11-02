@@ -4,7 +4,7 @@ from ..items import ClothingScraperItem
 class ClothingspiderSpider(scrapy.Spider):
     name = 'clothingspider'
     # allowed_domains = ['test.com']
-    start_urls = ['https://www.sastodeal.com/mens-fashion/clothing/jackets.html']
+    start_urls = ['https://www.sastodeal.com/mens-fashion/clothing.html']
     page_no = 1
 
     def parse(self, response):
@@ -17,10 +17,10 @@ class ClothingspiderSpider(scrapy.Spider):
             item['price'] = price
             yield item
 
-        
-        next_page = 'https://www.sastodeal.com/mens-fashion/clothing/jackets.html?p=' + str(self.page_no)
-        print(next_page)
-        if self.page_no < 15:
-            self.page_no += 1
+        # https://www.sastodeal.com/mens-fashion/clothing.html?p=
+        self.page_no += 1
+        next_page = 'https://www.sastodeal.com/mens-fashion/clothing.html?p=' + str(self.page_no)
+        # print(next_page)
+        if next_page:
             yield response.follow(url=next_page, callback=self.parse)
         
