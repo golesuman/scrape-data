@@ -1,5 +1,6 @@
 import scrapy
 from ..items import ClothingScraperItem
+from ..itemloaders import ClothingLoader
 
 class ClothingspiderSpider(scrapy.Spider):
     name = 'clothingspider'
@@ -11,16 +12,13 @@ class ClothingspiderSpider(scrapy.Spider):
         item = ClothingScraperItem()
         products = response.css("div.product.details.product-item-details")
         for product in products:
-            name = product.css("a.product-item-link::text").get()
-            price = product.css("span.price::text").get()
-            item['name'] = name
-            item['price'] = price
-            yield item
+            cloth = ClothingLoader(item=item, selector=product)
+            cloth.add_css("name", "a.product-item-link::text")
+            cloth.add_css("price","span.price::text")
+            yield cloth.load_item()
 
-        # https://www.sastodeal.com/mens-fashion/clothing.html?p=
         self.page_no += 1
         next_page = 'https://www.sastodeal.com/mens-fashion/clothing.html?p=' + str(self.page_no)
-        # print(next_page)
         if next_page:
             yield response.follow(url=next_page, callback=self.parse)
         
